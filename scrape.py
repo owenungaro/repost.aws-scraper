@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from parser import extract_post_data
 from downloader import scrape_page, save_page_safe, SAVED_DIR
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
 
 def sanitize_name(filename):
     return filename.replace(".html", "").replace("/", "_")
@@ -84,4 +85,7 @@ def main():
                 break
 
 if __name__ == "__main__":
+    start_time = time.time()
     main()
+    end_time = time.time()
+    print(f"Finished in {end_time - start_time:.2f} seconds.")
