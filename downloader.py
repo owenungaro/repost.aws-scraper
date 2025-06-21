@@ -1,3 +1,5 @@
+#Test1: 540 in 54 minutes
+
 from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 import os
@@ -5,6 +7,7 @@ import time
 import random
 from urllib.parse import urlparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from playwright.sync_api import sync_playwright
 
 SAVED_DIR = "saved_pages/"
 os.makedirs(SAVED_DIR, exist_ok=True)
@@ -34,18 +37,34 @@ def save_page(url, name="", verbose = False):
         # Launch browser in headless mode with realistic user using context
         # AWS blocks "bot" and "scraping" user attempts
         browser = p.chromium.launch(headless=True)
-        context = browser.new_context(user_agent=(
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/114.0.0.0 Safari/537.36"
-        ))
+        context = browser.new_context(
+            user_agent=(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/114.0.0.0 Safari/537.36"
+            ),
+            locale="en-US",
+            timezone_id="America/New_York",
+            viewport={"width": 1920, "height": 1080}
+        )
 
         # Creates a new page and injects headers
         page = context.new_page()
-        page.set_extra_http_headers({
-            "Accept-Language": "en-US,en;q=0.9",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
-        })
+
+        page.add_init_script("""
+            Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+            window.chrome = { runtime: {} };
+            Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3] });
+            Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
+        """)
+
+        page.goto(url, timeout=120000)
+
+        page.mouse.move(100, 100)
+        page.wait_for_timeout(3000)
+        page.mouse.wheel(0, 500)
+        page.wait_for_timeout(3000)
+
 
         # Visits URL and waits for JS to finish loading
         # AWS populates forum posts using JS and not HTML (standard)
@@ -53,6 +72,11 @@ def save_page(url, name="", verbose = False):
             print(f"[>] Saving: {url}")
         page.goto(url, timeout=60000)
         page.wait_for_load_state("networkidle")
+
+        try:
+            page.wait_for_selector(".custom-md-style", timeout=30000)
+        except:
+            print("[!] WAF likely blocked this page or content never appeared.")
 
         # Gets rendered HTML and writes to disk
         content = page.content()
@@ -69,24 +93,24 @@ def save_page_safe(url, verbose = False):
             print(f"[!] Error saving {url}: {e}")
 
 def scrape_page(url, verbose = False):
+    next_url = None  # Ensure this is defined even if the page fails
+
     save_page(url, name="index", verbose = verbose)
     with open(os.path.join(SAVED_DIR, "index.html"), "r", encoding="utf-8") as f:
         soup = BeautifulSoup(f, "html.parser")
 
     valid_links = []
 
-    # Looks for post links in <a> tags
     for a in soup.find_all("a", href=True):
         classes = a.get("class", [])
-        if any(c.startswith(("QuestionCard", "ArticleCard", "KCArticleCard")) for c in classes): # Add to this list for all specific HTML tags
+        if any(c.startswith(("QuestionCard", "ArticleCard", "KCArticleCard")) for c in classes):
             href = a["href"]
             if href.startswith("/"):
                 full_url = "https://repost.aws" + href
                 valid_links.append(full_url)
                 if verbose:
                     print(f"[+] Found post link: {full_url}")
-    
-    # Finds next page link
+
     next_button = soup.find("a", {"aria-label": "Go to next page"})
     if next_button and next_button.get("href"):
         next_href = next_button["href"]

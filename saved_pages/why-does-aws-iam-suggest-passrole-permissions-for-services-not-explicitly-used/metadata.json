@@ -1,0 +1,9 @@
+{
+  "title": "Why does AWS IAM suggest PassRole permissions for services not explicitly used?",
+  "author": "TheQuietBuilder",
+  "date": "2025-06-10T12:59:20.381Z",
+  "tags": [
+    "Security, Identity, & Compliance",
+    "Management & Governance"
+  ]
+}
