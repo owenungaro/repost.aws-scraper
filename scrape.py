@@ -34,7 +34,8 @@ def save_post_files(file_path, verbose=False):
             "title": data["title"],
             "author": data["author"],
             "date": data["date"],
-            "tags": data["tags"]
+            "tags": data["tags"],
+            "accepted": data["accepted"]
         }, f, indent=2)
 
     with open(os.path.join(post_dir, "body.json"), "w", encoding="utf-8") as f:
@@ -46,7 +47,7 @@ def run_one_page(url, verbose, max_links=None):
     
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)
         context = browser.new_context(
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                        "AppleWebKit/537.36 (KHTML, like Gecko) "

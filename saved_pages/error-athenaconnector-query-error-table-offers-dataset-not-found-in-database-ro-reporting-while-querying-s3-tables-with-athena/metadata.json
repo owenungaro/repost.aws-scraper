@@ -1,6 +1,0 @@
-{
-  "title": "[ERROR] [AthenaConnector::query] Error: Table offers_dataset not found in database ro_reporting while querying s3 tables with Athena",
-  "author": "Andreea",
-  "date": "2025-06-11T09:58:34.934Z",
-  "tags": []
-}

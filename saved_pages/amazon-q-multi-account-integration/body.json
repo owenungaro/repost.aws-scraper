@@ -1,3 +1,0 @@
-{
-  "body": "I'm using Amazon Q with MS Teams integration, and it works great for one AWS account. How can I use it to query resources (like EC2 instances) across multiple accounts in my org (around 50 accounts)? Is cross-account support possible, and how do I set it up?\n\nYes, Amazon Q enables multi-account integration, allowing users to query resources across multiple AWS accounts efficiently. To implement this functionality, organizations must configure cross-account access using AWS Identity and Access Management (IAM) and AWS Organizations, ensuring secure and seamless interaction between accounts:\nhttps://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/multiple-qbusiness-apps-idp.html"
-}

@@ -1,3 +1,0 @@
-{
-  "body": "S3 Bucket Versioning\nCan S3 object versioning recover data deleted before it was enabled?\nI enabled versioning on my S3 bucket this morning, but I\u2019m wondering if I can recover a file that was accidentally deleted yesterday, before versioning was turned on. Does AWS keep any shadow copies or backups, or is that object gone for good?\n\nAfraid you cant. Versioning only works from the point you switch it on!\nIts gone for good unless you have versioning or AWS Backup"
-}

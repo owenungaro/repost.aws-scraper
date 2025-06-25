@@ -39,13 +39,19 @@ def extract_post_data(soup):
         except (json.JSONDecodeError, TypeError):
             pass
 
+    # Extract ACCEPTED status
+    accepted_tag = soup.find("span", string="Accepted Answer")
+    accepted = accepted_tag is not None
+
     return {
         "title": title,
         "author": author,
         "date": date,
         "tags": tags,
-        "body": body
+        "body": body,
+        "accepted": accepted
     }
+
 
 
 def parse_all_posts():

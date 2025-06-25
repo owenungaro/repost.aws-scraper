@@ -1,3 +1,0 @@
-{
-  "body": "Hi,\nI'm trying to run the AWS-RunPatchBaseline SSM document to apply updates on my EC2 instance, but I'm getting the following error in the Run Command output:\nUnable to gain necessary access for possible kernel updates, code: 1\nEnvironment:\nOS: Amazon Linux 2\nSSM Agent: Installed with  3.3.2656.0 version\nIAM Role: AmazonSSMManagedInstanceCore is attached\nInstance State: Managed and reachable by SSM\nHow can I resolve this and ensure that kernel patches are applied successfully?"
-}

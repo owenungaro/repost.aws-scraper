@@ -1,6 +1,0 @@
-{
-  "title": "ELBSecurityPolicy-TLS13-1-2-Res-2021-06 policy allows RSA+SHA1 cipher even when undocumented. How can this RSA+SHA1 be disallowed?",
-  "author": "Liviu",
-  "date": "2025-05-29T11:27:07.171Z",
-  "tags": []
-}

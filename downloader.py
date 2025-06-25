@@ -1,5 +1,15 @@
 #Test1: 540 in 54 minutes
 #Test2: 300 in 9 minutes
+#Test3: 3454 in 408 minutes
+
+# TODO:
+# Add accepted answer if flag is positive
+# Display body and accepted in a more readable formatt
+# Correctly stop executing program if on last page
+#   - Seems to be accessing next page links even when ran out
+# Create parser
+# Try to stop window popup
+# Fix flags (download and structure don't work)
 
 from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup

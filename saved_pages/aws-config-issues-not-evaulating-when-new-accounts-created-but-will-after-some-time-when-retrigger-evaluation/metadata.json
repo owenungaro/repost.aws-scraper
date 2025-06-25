@@ -1,6 +1,0 @@
-{
-  "title": "AWS Config issues not evaulating when new accounts created, but will after some time when retrigger evaluation",
-  "author": "AWSST25",
-  "date": "2025-06-18T17:08:38.192Z",
-  "tags": []
-}
