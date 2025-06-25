@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from parser import extract_post_data
 from downloader import scrape_page, save_page_safe, SAVED_DIR
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from playwright.sync_api import sync_playwright
 import time
 
 def sanitize_name(filename):
@@ -42,23 +43,39 @@ def save_post_files(file_path, verbose=False):
     os.remove(file_path)
 
 def run_one_page(url, verbose, max_links=None):
-    links, next_url = scrape_page(url, verbose=verbose)
+    
 
-    if max_links is not None:
-        links = links[:max_links]
-        if verbose:
-            print(f"[!] Truncating to first {max_links} links")
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False)
+        context = browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                       "AppleWebKit/537.36 (KHTML, like Gecko) "
+                       "Chrome/114.0.0.0 Safari/537.36",
+            locale="en-US",
+            timezone_id="America/New_York",
+            viewport={"width": 1920, "height": 1080}
+        )
 
-    with ThreadPoolExecutor(max_workers=4) as executor:
-        futures = [executor.submit(save_page_safe, link, verbose) for link in links]
-        for future in as_completed(futures):
-            future.result()
+        # Now that context exists, we can pass it to scrape_page
+        links, next_url = scrape_page(url, context, verbose=verbose)
+
+        if max_links is not None:
+            links = links[:max_links]
+            if verbose:
+                print(f"[!] Truncating to first {max_links} links")
+
+        for link in links:
+            save_page_safe(link, context, verbose)
+
+        browser.close()
 
     html_files = [f for f in os.listdir(SAVED_DIR) if f.endswith(".html")]
     for file_name in html_files:
         save_post_files(os.path.join(SAVED_DIR, file_name), verbose=verbose)
 
     return next_url, len(links)
+
+
 
 def main():
     parser = argparse.ArgumentParser(description="Scrape and structure AWS re:Post pages.")
@@ -72,7 +89,7 @@ def main():
     max_total = args.max
     remaining = args.max
 
-    base_url = "https://repost.aws/search/content?globalSearch=IAM+Policy&sort=recent&page=eyJ2IjoyLCJuIjoiOHlUcTNKbG1CVmJZbkdlemZiRWx1dz09IiwidCI6ImVTZUlIRkxoUFo0ejc5OGVDM1dockE9PSJ9"
+    base_url = "https://repost.aws/search/content?globalSearch=IAM+Policy&sort=recent"
     current_url = base_url
 
     while current_url:

@@ -1,4 +1,5 @@
 #Test1: 540 in 54 minutes
+#Test2: 300 in 9 minutes
 
 from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
@@ -12,18 +13,19 @@ from playwright.sync_api import sync_playwright
 SAVED_DIR = "saved_pages/"
 os.makedirs(SAVED_DIR, exist_ok=True)
 
+# Convert URL to safe filename
 def url_to_filename(url):
     parsed = urlparse(url)
     path = parsed.path.strip("/").replace("/", "_")
     return path or "index"
 
-
+# Generate path from URL
 def generate_filename(url):
     parsed = urlparse(url)
     path = parsed.path.strip("/").replace("/", "_")
     return os.path.join(SAVED_DIR, f"{path}.html")
 
-def save_page(url, name="", verbose = False):
+def save_page(url, context, name="", verbose=False, proxy=None):
     if not name:
         name = url.split("/")[-1] or "index"
 
@@ -31,76 +33,84 @@ def save_page(url, name="", verbose = False):
     if os.path.exists(path):
         if verbose:
             print(f"[=] Skipping (already saved): {url}")
-        return
+        return True
 
-    with sync_playwright() as p:
-        # Launch browser in headless mode with realistic user using context
-        # AWS blocks "bot" and "scraping" user attempts
-        browser = p.chromium.launch(headless=True)
-        context = browser.new_context(
-            user_agent=(
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/114.0.0.0 Safari/537.36"
-            ),
-            locale="en-US",
-            timezone_id="America/New_York",
-            viewport={"width": 1920, "height": 1080}
-        )
+    # Creates a new page from shared browser context
+    page = context.new_page()
 
-        # Creates a new page and injects headers
-        page = context.new_page()
+    # Stealth anti bot patches
+    page.add_init_script("""
+        Object.defineProperty(navigator, 'webdriver', { get: () => false });
+        Object.defineProperty(navigator, 'platform', { get: () => 'Win32' });
+        window.chrome = { runtime: {} };
+        Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3] });
+        Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
+    """)
 
-        page.add_init_script("""
-            Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
-            window.chrome = { runtime: {} };
-            Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3] });
-            Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
-        """)
+    if verbose:
+        print(f"[>] Saving: {url}")
 
-        page.goto(url, timeout=120000)
-
-        page.mouse.move(100, 100)
-        page.wait_for_timeout(3000)
-        page.mouse.wheel(0, 500)
-        page.wait_for_timeout(3000)
-
-
-        # Visits URL and waits for JS to finish loading
-        # AWS populates forum posts using JS and not HTML (standard)
-        if verbose:    
-            print(f"[>] Saving: {url}")
-        page.goto(url, timeout=60000)
-        page.wait_for_load_state("networkidle")
-
-        try:
-            page.wait_for_selector(".custom-md-style", timeout=30000)
-        except:
-            print("[!] WAF likely blocked this page or content never appeared.")
-
-        # Gets rendered HTML and writes to disk
-        content = page.content()
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(content)
-        browser.close()
-
-def save_page_safe(url, verbose = False):
+    # Attempts to load page
     try:
-        time.sleep(random.uniform(1.0, 2.0))  # Random delay
-        save_page(url, verbose = verbose)
+        page.goto(url, timeout=60000)
+    except Exception as e:
+        print(f"[!] Failed to load page {url}: {e}")
+        return False
+
+    # Checks for CAPTCHA
+    content = page.content()
+    if "JavaScript is disabled" in content or "verify that you're not a robot" in content:
+        if verbose:
+            print(f"[!] CAPTCHA detected on: {url}")
+        try:
+            # Waits for user to solve CAPTCHA (indefinitely)
+            page.wait_for_selector(".custom-md-style", timeout=0)
+        except:
+            print("[!] Manual CAPTCHA solve timeout.")
+
+    # Waits for page to load context
+    try:
+        page.wait_for_selector(".custom-md-style", timeout=15000)
+    except:
+        if verbose:
+            print("[!] Warning: content selector `.custom-md-style` not found.")
+
+    # Save HTML content
+    content = page.content()
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(content)
+
+    page.close()
+    return True
+
+
+def save_page_safe(url, context, verbose=False):
+    try:
+        time.sleep(random.uniform(0.3, 0.7))  # Random delay, prevents bot detection
+        save_page(url, context, verbose=verbose)
     except Exception as e:
         if verbose:
             print(f"[!] Error saving {url}: {e}")
 
-def scrape_page(url, verbose = False):
-    next_url = None  # Ensure this is defined even if the page fails
 
-    save_page(url, name="index", verbose = verbose)
+def scrape_page(url, context, verbose=False):
+    next_url = None  # Default value if nothing is found
+
+    # Downloads search page results
+    success = save_page(url, context, name="index", verbose=verbose)
+    if not success:
+        if verbose:
+            print(f"[!] Skipping parse of {url} due to failed save.")
+        return [], None
+
+    # Loads saved HTML
     with open(os.path.join(SAVED_DIR, "index.html"), "r", encoding="utf-8") as f:
+
         soup = BeautifulSoup(f, "html.parser")
 
     valid_links = []
 
+    # Extracts useful info
     for a in soup.find_all("a", href=True):
         classes = a.get("class", [])
         if any(c.startswith(("QuestionCard", "ArticleCard", "KCArticleCard")) for c in classes):
@@ -111,6 +121,7 @@ def scrape_page(url, verbose = False):
                 if verbose:
                     print(f"[+] Found post link: {full_url}")
 
+    # Check if there is a next page button
     next_button = soup.find("a", {"aria-label": "Go to next page"})
     if next_button and next_button.get("href"):
         next_href = next_button["href"]
@@ -127,7 +138,7 @@ def iterate_pages(verbose = False):
         tuple: (number of pages visited, list of unique post links)
     """
 
-    base_url = "https://repost.aws/search/content?globalSearch=IAM+Policy&sort=recent&page=eyJ2IjoyLCJuIjoiOHlUcTNKbG1CVmJZbkdlemZiRWx1dz09IiwidCI6ImVTZUlIRkxoUFo0ejc5OGVDM1dockE9PSJ9"
+    base_url = "https://repost.aws/search/content?globalSearch=IAM+Policy&sort=recent"
     page = 1
     all_links = []
 

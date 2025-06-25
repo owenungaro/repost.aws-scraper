@@ -2,8 +2,5 @@
   "title": "How can I optimize data transfer costs between Amazon S3 and EC2 instances across different AWS Regions while ensuring compliance with data residency requirements?",
   "author": "Ushpal",
   "date": "2025-06-20T13:13:38.806Z",
-  "tags": [
-    "Networking & Content Delivery",
-    "AWS Compliance"
-  ]
+  "tags": []
 }

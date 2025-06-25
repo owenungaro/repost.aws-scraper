@@ -2,11 +2,5 @@
   "title": "Lambda <-> RDS Proxy <-> RDS (PostgreSQL) 10 fold slower than Lambda <-> RDS",
   "author": "Jeanine",
   "date": "2025-06-20T15:25:52.466Z",
-  "tags": [
-    "Serverless",
-    "Compute",
-    "Database",
-    "Management & Governance",
-    "Networking & Content Delivery"
-  ]
+  "tags": []
 }

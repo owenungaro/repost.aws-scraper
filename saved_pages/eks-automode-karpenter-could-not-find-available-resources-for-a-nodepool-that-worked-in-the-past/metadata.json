@@ -2,8 +2,5 @@
   "title": "EKS automode: Karpenter could not find available resources for a nodepool that worked in the past",
   "author": "SZ",
   "date": "2025-06-18T19:16:56.745Z",
-  "tags": [
-    "Compute",
-    "Containers"
-  ]
+  "tags": []
 }

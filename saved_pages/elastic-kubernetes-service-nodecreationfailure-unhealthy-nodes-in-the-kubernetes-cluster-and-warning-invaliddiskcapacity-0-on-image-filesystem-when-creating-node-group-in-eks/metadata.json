@@ -1,0 +1,6 @@
+{
+  "title": "Elastic Kubernetes Service: NodeCreationFailure \"Unhealthy nodes in the kubernetes cluster\" and warning \"InvalidDiskCapacity 0 on image filesystem\" when creating Node Group in EKS",
+  "author": "Juan Pablo Moreno",
+  "date": "2025-06-04T20:28:06.327Z",
+  "tags": []
+}

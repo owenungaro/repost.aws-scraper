@@ -2,9 +2,5 @@
   "title": "LakeFormation GetDataAccess event not captured by Eventbridge",
   "author": "Harshit",
   "date": "2025-06-19T12:16:18.933Z",
-  "tags": [
-    "Serverless",
-    "Application Integration",
-    "Analytics"
-  ]
+  "tags": []
 }

@@ -2,8 +2,5 @@
   "title": "CodeCommit pipeline fails after deployed from CDK",
   "author": "Benjamin",
   "date": "2025-06-10T09:44:19.257Z",
-  "tags": [
-    "Developer Tools",
-    "AWS Cloud Development Kit (CDK)"
-  ]
+  "tags": []
 }
