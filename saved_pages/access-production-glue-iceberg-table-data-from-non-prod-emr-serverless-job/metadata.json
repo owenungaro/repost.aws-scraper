@@ -3,5 +3,6 @@
   "author": "Shriram",
   "date": "2025-06-25T13:52:20.647Z",
   "tags": [],
-  "accepted": true
+  "accepted": true,
+  "link": "https://repost.aws/questions/QUMbgfRVJOSeKuVNWkC0AcHA/access-production-glue-iceberg-table-data-from-non-prod-emr-serverless-job"
 }

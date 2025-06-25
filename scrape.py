@@ -11,7 +11,7 @@ import time
 def sanitize_name(filename):
     return filename.replace(".html", "").replace("/", "_")
 
-def save_post_files(file_path, verbose=False):
+def save_post_files(file_path, link=None, verbose=False):
     file_name = os.path.basename(file_path)
     post_name = sanitize_name(file_name)
     post_dir = os.path.join(SAVED_DIR, post_name)
@@ -35,7 +35,8 @@ def save_post_files(file_path, verbose=False):
             "author": data["author"],
             "date": data["date"],
             "tags": data["tags"],
-            "accepted": data["accepted"]
+            "accepted": data["accepted"],
+            "link": link
         }, f, indent=2)
 
     with open(os.path.join(post_dir, "body.json"), "w", encoding="utf-8") as f:
@@ -72,7 +73,10 @@ def run_one_page(url, verbose, max_links=None):
 
     html_files = [f for f in os.listdir(SAVED_DIR) if f.endswith(".html")]
     for file_name in html_files:
-        save_post_files(os.path.join(SAVED_DIR, file_name), verbose=verbose)
+        # match the file to the original link by filename
+        matching_link = next((link for link in links if file_name in link or file_name.startswith(link.split("/")[-1])), None)
+        save_post_files(os.path.join(SAVED_DIR, file_name), link=matching_link, verbose=verbose)
+
 
     return next_url, len(links)
 
