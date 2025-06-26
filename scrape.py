@@ -29,6 +29,7 @@ def save_post_files(file_path, link=None, verbose=False):
 
     data = extract_post_data(soup)
 
+    # Write metadata
     with open(os.path.join(post_dir, "metadata.json"), "w", encoding="utf-8") as f:
         json.dump({
             "title": data["title"],
@@ -39,14 +40,41 @@ def save_post_files(file_path, link=None, verbose=False):
             "link": link
         }, f, indent=2)
 
+    # Write main body
     with open(os.path.join(post_dir, "body.json"), "w", encoding="utf-8") as f:
         json.dump({"body": data["body"]}, f, indent=2)
 
+    # Write accepted answer if it exists
+    # TODO: Inaccurate (around 66% according to small scale testing)
+    if data["accepted"]:
+        # print("[DEBUG] Accepted answer found")
+        
+        for tag in soup.find_all("span", string="Accepted Answer"):
+            # print("[DEBUG] Accepted tag span located")
+            
+            # Try to locate the next .custom-md-style sibling or nearby tag
+            parent = tag
+            for _ in range(10):
+                parent = parent.parent
+                if not parent:
+                    break
+                content_div = parent.find("div", class_="custom-md-style")
+                if content_div:
+                    # print("[DEBUG] Accepted answer content found")
+                    accepted_text = content_div.get_text(separator="\n").strip()
+                    accepted_path = os.path.join(post_dir, "accepted_answer.json")
+                    with open(accepted_path, "w", encoding="utf-8") as f:
+                        json.dump({"accepted_answer": accepted_text}, f, indent=2)
+                    if verbose:
+                        print(f"[+] Saved accepted_answer.json for: {file_name}")
+                    break
+            # else:
+                # print("[DEBUG] Accepted tag found, but no custom-md-style found in parents")
+
     os.remove(file_path)
 
-def run_one_page(url, verbose, max_links=None):
-    
 
+def run_one_page(url, verbose, max_links=None):
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         context = browser.new_context(

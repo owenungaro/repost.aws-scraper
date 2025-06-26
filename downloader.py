@@ -8,7 +8,6 @@
 # Correctly stop executing program if on last page
 #   - Seems to be accessing next page links even when ran out
 # Create parser
-# Try to stop window popup
 # Fix flags (download and structure don't work)
 
 from playwright.sync_api import sync_playwright
@@ -136,9 +135,9 @@ def scrape_page(url, context, verbose=False):
     if next_button and next_button.get("href"):
         next_href = next_button["href"]
         next_url = "https://repost.aws" + next_href
-        print(f"[NEXT] {next_url}")
+        if verbose: print(f"[NEXT] {next_url}")
     else:
-        print("[NEXT] No next page found.")
+        if verbose: print("[NEXT] No next page found.")
 
     return valid_links, next_url
 
