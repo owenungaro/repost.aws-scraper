@@ -49,18 +49,13 @@ def save_post_files(file_path, link=None, verbose=False):
     if data["accepted"]:
         # print("[DEBUG] Accepted answer found")
         
-        for tag in soup.find_all("span", string="Accepted Answer"):
-            # print("[DEBUG] Accepted tag span located")
-            
-            # Try to locate the next .custom-md-style sibling or nearby tag
-            parent = tag
-            for _ in range(10):
-                parent = parent.parent
-                if not parent:
-                    break
-                content_div = parent.find("div", class_="custom-md-style")
+        # Limit the search to the main post container only (avoid sidebar)
+        main_container = soup.find("main") or soup.find("div", {"class": "css-12dv1kw"})
+        if main_container:
+            for tag in main_container.find_all("span", string="Accepted Answer"):
+                # Search nearby for the content div
+                content_div = tag.find_next("div", class_="custom-md-style")
                 if content_div:
-                    # print("[DEBUG] Accepted answer content found")
                     accepted_text = content_div.get_text(separator="\n").strip()
                     accepted_path = os.path.join(post_dir, "accepted_answer.json")
                     with open(accepted_path, "w", encoding="utf-8") as f:
@@ -68,8 +63,7 @@ def save_post_files(file_path, link=None, verbose=False):
                     if verbose:
                         print(f"[+] Saved accepted_answer.json for: {file_name}")
                     break
-            # else:
-                # print("[DEBUG] Accepted tag found, but no custom-md-style found in parents")
+
 
     os.remove(file_path)
 
@@ -122,7 +116,7 @@ def main():
     max_total = args.max
     remaining = args.max
 
-    base_url = "https://repost.aws/search/content?globalSearch=IAM+Policy&sort=recent"
+    base_url = "https://repost.aws/search/content?globalSearch=IAM+Policy&sort=recent&page=eyJ2IjoyLCJuIjoidDBQWFhGVEVNL2FjZ3NSakdJVC8wQT09IiwidCI6ImdFT29sSXRGalNXalpPTTZZYmovNXc9PSJ9"
     current_url = base_url
 
     while current_url:
