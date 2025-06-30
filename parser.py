@@ -11,9 +11,18 @@ def extract_post_data(soup):
     title = title_tag.get_text(strip=True) if title_tag else None
 
     # Extract post body
-    body_sections = soup.find_all("div", class_="custom-md-style")
-    body = "\n\n".join(div.get_text(strip=True, separator="\n") for div in body_sections) if body_sections else "[No body found]"
+    main_post = None
+    main_container = soup.find("main") or soup.find("div", class_="css-12dv1kw")
+    if main_container:
+        # Look for the post/question text block
+        candidates = main_container.find_all("div", class_="custom-md-style", recursive=True)
+        if candidates:
+            main_post = candidates[0]  # First is almost always the question text
 
+    if main_post:
+        question_text = main_post.get_text(separator="\n").strip()
+    else:
+        question_text = ""
     # Extract author
     author_tag = soup.find("a", class_="Avatar_displayNameLink__ZHYcf")
     if author_tag:
@@ -48,7 +57,7 @@ def extract_post_data(soup):
         "author": author,
         "date": date,
         "tags": tags,
-        "body": body,
+        "body": question_text,
         "accepted": accepted
     }
 
