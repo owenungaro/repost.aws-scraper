@@ -2,7 +2,11 @@ import os
 import json
 import time
 import argparse
+import sys
 
+def print_status(message):
+    sys.stdout.write('\r\033[K' + message)
+    sys.stdout.flush()
 
 def extract_first_policy_block(text):
     depth = 0
@@ -83,10 +87,10 @@ def filter_repaired(saved_dir='saved_pages', filtered_dir='filtered_pages/repair
             with open(os.path.join(filtered_dir, 'results', f"{index}.json"), 'w') as f:
                 json.dump(ans_policy, f, indent=2)
 
-            print(f"[+] Saved repaired triplet #{index}")
+            print_status(f"[+] Saved repaired triplet #{index}")
             index += 1
 
-    print(f"[INFO] Total repaired posts: {index}")
+    print(f"\n[INFO] Total repaired posts: {index}")
 
 
 def filter_broken(saved_dir='saved_pages', filtered_dir='filtered_pages/broken'):
@@ -115,10 +119,10 @@ def filter_broken(saved_dir='saved_pages', filtered_dir='filtered_pages/broken')
             with open(os.path.join(filtered_dir, 'intent', f"{index}.json"), 'w', encoding='utf-8') as f:
                 f.write(body_remainder.strip())
 
-            print(f"[+] Saved broken pair #{index}")
+            print_status(f"[+] Saved broken pair #{index}")
             index += 1
 
-    print(f"[INFO] Total broken posts: {index}")
+    print(f"\n[INFO] Total broken posts: {index}")
 
 
 if __name__ == "__main__":
