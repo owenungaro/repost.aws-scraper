@@ -147,7 +147,7 @@ if __name__ == "__main__":
             if not has_body:
                 print(f"[X] Missing body.json")
             elif not has_ans:
-                print(f"[✓] Broken: has body.json, no accepted_answer.json")
+                print(f"[>] Broken: has body.json, no accepted_answer.json")
             else:
                 body_json = load_json(body_path)
                 ans_json = load_json(ans_path)
@@ -156,7 +156,7 @@ if __name__ == "__main__":
                 bp, _ = extract_first_policy_block(body_text)
                 ap, _ = extract_first_policy_block(ans_text)
                 if bp and ap:
-                    print(f"[✓] Repaired: valid policy + accepted answer")
+                    print(f"[>] Repaired: valid policy + accepted answer")
                 else:
                     print(f"[X] Invalid or missing policy/answer")
 
