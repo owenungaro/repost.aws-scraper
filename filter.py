@@ -78,9 +78,8 @@ def filter_repaired(saved_dir='saved_pages', filtered_dir='filtered_pages/repair
                 json.dump(body_policy, f, indent=2)
 
             with open(os.path.join(filtered_dir, 'intent', f"{index}.json"), 'w', encoding='utf-8') as f:
-                f.write('{\n  "body": """\n')
                 f.write(body_remainder.strip())
-                f.write('\n"""\n}')
+
 
             with open(os.path.join(filtered_dir, 'results', f"{index}.json"), 'w') as f:
                 json.dump(ans_policy, f, indent=2)
