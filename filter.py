@@ -129,10 +129,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Filter IAM policy forum posts")
     parser.add_argument("-r", "--repaired", action="store_true", help="Extract only posts with accepted answers (repaired)")
     parser.add_argument("-b", "--broken", action="store_true", help="Extract only posts with no accepted answer (broken)")
+    parser.add_argument("-x", "--relaxed", action="store_true", help="Extra-loose regex-based filtering for weak policies")
     parser.add_argument("-s", "--single", help="Test a specific folder")
 
     args = parser.parse_args()
     start = time.time()
+
+    ran = False
 
     if args.single:
         folder_path = os.path.join("saved_pages", args.single)
@@ -159,16 +162,20 @@ if __name__ == "__main__":
                     print(f"[>] Repaired: valid policy + accepted answer")
                 else:
                     print(f"[X] Invalid or missing policy/answer")
+        ran = True
 
-    elif args.repaired:
+    if args.repaired:
         print("[INFO] Running filter for repaired posts...")
         filter_repaired()
+        ran = True
 
-    elif args.broken:
+    if args.broken:
         print("[INFO] Running filter for broken posts...")
         filter_broken()
+        ran = True
 
-    else:
+    if not ran:
         parser.print_help()
+
 
     print(f"[INFO] Done in {time.time() - start:.2f}s")
