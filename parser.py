@@ -5,6 +5,7 @@ SAVED_DIR = "saved_pages/"
 
 import json
 
+
 def extract_post_data(soup):
     # Extract title
     title_tag = soup.find("h1")
@@ -15,7 +16,9 @@ def extract_post_data(soup):
     main_container = soup.find("main") or soup.find("div", class_="css-12dv1kw")
     if main_container:
         # Look for the post/question text block
-        candidates = main_container.find_all("div", class_="custom-md-style", recursive=True)
+        candidates = main_container.find_all(
+            "div", class_="custom-md-style", recursive=True
+        )
         if candidates:
             main_post = candidates[0]  # First is almost always the question text
 
@@ -44,7 +47,9 @@ def extract_post_data(soup):
     if json_ld_tag:
         try:
             json_data = json.loads(json_ld_tag.string)
-            date = json_data.get("datePublished") or json_data.get("mainEntity", {}).get("datePublished")
+            date = json_data.get("datePublished") or json_data.get(
+                "mainEntity", {}
+            ).get("datePublished")
         except (json.JSONDecodeError, TypeError):
             pass
 
@@ -58,9 +63,8 @@ def extract_post_data(soup):
         "date": date,
         "tags": tags,
         "body": question_text,
-        "accepted": accepted
+        "accepted": accepted,
     }
-
 
 
 def parse_all_posts():
@@ -73,6 +77,7 @@ def parse_all_posts():
                 post_data = extract_post_data(soup)
                 posts.append(post_data)
     return posts
+
 
 if __name__ == "__main__":
     all_posts = parse_all_posts()

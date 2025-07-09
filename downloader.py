@@ -1,13 +1,10 @@
-#Test1: 540 in 54 minutes
-#Test2: 300 in 9 minutes
-#Test3: 3454 in 408 minutes
+# Test1: 540 in 54 minutes
+# Test2: 300 in 9 minutes
+# Test3: 3454 in 408 minutes
+# Test4: in 9968 289 seconds (17376.05 seconds)
+
 
 # TODO:
-# Add accepted answer if flag is positive
-# Display body and accepted in a more readable formatt
-# Correctly stop executing program if on last page
-#   - Seems to be accessing next page links even when ran out
-# Create parser
 # Fix flags (download and structure don't work)
 
 from playwright.sync_api import sync_playwright
@@ -22,17 +19,20 @@ from playwright.sync_api import sync_playwright
 SAVED_DIR = "saved_pages/"
 os.makedirs(SAVED_DIR, exist_ok=True)
 
+
 # Convert URL to safe filename
 def url_to_filename(url):
     parsed = urlparse(url)
     path = parsed.path.strip("/").replace("/", "_")
     return path or "index"
 
+
 # Generate path from URL
 def generate_filename(url):
     parsed = urlparse(url)
     path = parsed.path.strip("/").replace("/", "_")
     return os.path.join(SAVED_DIR, f"{path}.html")
+
 
 def save_page(url, context, name="", verbose=False, proxy=None):
     if not name:
@@ -48,13 +48,15 @@ def save_page(url, context, name="", verbose=False, proxy=None):
     page = context.new_page()
 
     # Stealth anti bot patches
-    page.add_init_script("""
+    page.add_init_script(
+        """
         Object.defineProperty(navigator, 'webdriver', { get: () => false });
         Object.defineProperty(navigator, 'platform', { get: () => 'Win32' });
         window.chrome = { runtime: {} };
         Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3] });
         Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
-    """)
+    """
+    )
 
     if verbose:
         print(f"[>] Saving: {url}")
@@ -68,7 +70,10 @@ def save_page(url, context, name="", verbose=False, proxy=None):
 
     # Checks for CAPTCHA
     content = page.content()
-    if "JavaScript is disabled" in content or "verify that you're not a robot" in content:
+    if (
+        "JavaScript is disabled" in content
+        or "verify that you're not a robot" in content
+    ):
         if verbose:
             print(f"[!] CAPTCHA detected on: {url}")
         try:
@@ -122,7 +127,10 @@ def scrape_page(url, context, verbose=False):
     # Extracts useful info
     for a in soup.find_all("a", href=True):
         classes = a.get("class", [])
-        if any(c.startswith(("QuestionCard", "ArticleCard", "KCArticleCard")) for c in classes):
+        if any(
+            c.startswith(("QuestionCard", "ArticleCard", "KCArticleCard"))
+            for c in classes
+        ):
             href = a["href"]
             if href.startswith("/"):
                 full_url = "https://repost.aws" + href
@@ -135,13 +143,16 @@ def scrape_page(url, context, verbose=False):
     if next_button and next_button.get("href"):
         next_href = next_button["href"]
         next_url = "https://repost.aws" + next_href
-        if verbose: print(f"[NEXT] {next_url}")
+        if verbose:
+            print(f"[NEXT] {next_url}")
     else:
-        if verbose: print("[NEXT] No next page found.")
+        if verbose:
+            print("[NEXT] No next page found.")
 
     return valid_links, next_url
 
-def iterate_pages(verbose = False):
+
+def iterate_pages(verbose=False):
     """
     Returns:
         tuple: (number of pages visited, list of unique post links)
@@ -155,12 +166,12 @@ def iterate_pages(verbose = False):
     while next_url:
         if verbose:
             print(f"[Downloader] Scraping page {page}: {next_url}")
-        links, next_url = scrape_page(next_url, verbose = verbose)
+        links, next_url = scrape_page(next_url, verbose=verbose)
         all_links.extend(links)
         page += 1
-        #TODO Pagination
+        # TODO Pagination
 
-    unique_links = list(set(all_links)) # Unique post URLS
+    unique_links = list(set(all_links))  # Unique post URLS
 
     # Logic moved to scrape.py
     # # Multithread download
@@ -170,6 +181,7 @@ def iterate_pages(verbose = False):
     #         future.result() # Block until all downloads complete (C++ wait())
 
     return page - 1, unique_links
+
 
 if __name__ == "__main__":
     pages, links = iterate_pages()
