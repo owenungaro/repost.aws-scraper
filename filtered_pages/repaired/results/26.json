@@ -1,0 +1,6 @@
+{
+  "Effect": "Allow",
+  "Principal": "*",
+  "Action": "execute-api:Invoke",
+  "Resource": "execute-api:/*/*/*"
+}

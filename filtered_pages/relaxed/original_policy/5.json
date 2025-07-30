@@ -1,0 +1,11 @@
+{
+  "Statement": [
+    {
+      "Action": "*",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Resource": "arn:aws:*:*:<account-id>:*"
+    }
+  ],
+  "Version": "2012-10-17"
+}

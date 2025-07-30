@@ -1,0 +1,11 @@
+{
+  "Effect": "Allow",
+  "Action": [
+    "iot:CreateRoleAlias",
+    "iot:DeleteRoleAlias",
+    "iot:DescribeRoleAlias",
+    "iot:UpdateRoleAlias",
+    "iot:ListTagsForResource"
+  ],
+  "Resource": "*"
+}

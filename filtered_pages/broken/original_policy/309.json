@@ -1,0 +1,16 @@
+{
+  "Effect": "Allow",
+  "Action": [
+    "ssm:SendCommand"
+  ],
+  "Resource": [
+    "arn:aws:ec2:*:*:instance/*"
+  ],
+  "Condition": {
+    "StringEquals": {
+      "ssm:resourceTag/CreatedBy": [
+        "EC2 Image Builder"
+      ]
+    }
+  }
+}

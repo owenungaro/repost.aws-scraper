@@ -1,0 +1,31 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "textract:*",
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket",
+        "s3:PutObject",
+        "s3:GetObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::<<my_bucket_name>>",
+        "arn:aws:s3:::<<my_bucket_name>>/*",
+        "arn:aws:s3:::textract-console-us-east-1-<<auto_created_id_1>>",
+        "arn:aws:s3:::textract-console-us-east-1-<<auto_created_id_1>>/*",
+        "arn:aws:s3:::textract-adapters-us-east-1-<<auto_created_id_2>>",
+        "arn:aws:s3:::textract-adapters-us-east-1-<<auto_created_id_2>>/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": "logs:*",
+      "Resource": "*"
+    }
+  ]
+}

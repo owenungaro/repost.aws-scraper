@@ -1,0 +1,15 @@
+{
+  "Effect": "Deny",
+  "Principal": {
+    "AWS": "*"
+  },
+  "Action": "sts:AssumeRole",
+  "Condition": {
+    "StringNotEquals": {
+      "aws:PrincipalOrgId": "${aws:ResourceOrgId}"
+    },
+    "BoolIfExists": {
+      "aws:PrincipalIsAWSService": "false"
+    }
+  }
+}

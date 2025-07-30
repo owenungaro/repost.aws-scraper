@@ -1,0 +1,13 @@
+{
+  "Effect": "Allow",
+  "Principal": {
+    "AWS": "arn:aws:iam::B-ID:root"
+  },
+  "Action": [
+    "sms-voice:SendTextMessage",
+    "sms-voice:SendVoiceMessage",
+    "sms-voice:SendMediaMessage",
+    "sms-voice:DescribeSenderIds"
+  ],
+  "Resource": "arn:aws:sms-voice:Region:A-ID:sender-id/SenderID/ISO"
+}

@@ -1,0 +1,10 @@
+{
+  "Effect": "Allow",
+  "Principal": {
+    "Service": [
+      "ecs.amazonaws.com",
+      "codedeploy.amazonaws.com"
+    ]
+  },
+  "Action": "sts:AssumeRole"
+}

@@ -1,0 +1,10 @@
+{
+  "Effect": "Allow",
+  "Action": [
+    "sagemaker:CreateInferenceComponent"
+  ],
+  "Resource": [
+    "arn:aws:sagemaker:*:xx:endpoint/*",
+    "arn:aws:sagemaker:*:xx:inference-component/*"
+  ]
+}

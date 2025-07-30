@@ -1,0 +1,32 @@
+{
+  "Version": "2012-10-17",
+  "Id": "CrossAccountAccess",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "delivery.logs.amazonaws.com"
+      },
+      "Action": "s3:PutObject",
+      "Resource": "${bucket arn}/*",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceOrgID": "o-XXXXX"
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "delivery.logs.amazonaws.com"
+      },
+      "Action": "s3:GetBucketAcl",
+      "Resource": "${bucket arn}",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceOrgID": "o-XXXXX"
+        }
+      }
+    }
+  ]
+}

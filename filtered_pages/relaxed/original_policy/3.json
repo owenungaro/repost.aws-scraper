@@ -1,0 +1,7 @@
+{
+  "Effect": "Allow",
+  "Principal": {
+    "AWS": "arn:aws:iam::ACCOUNT_A:role/AccountALambdaRole"
+  },
+  "Action": "sts:AssumeRole"
+}

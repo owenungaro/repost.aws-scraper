@@ -1,0 +1,16 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": [
+          "arn:aws:iam::<id>:root",
+          "arn:aws:iam::<id>:user/<user>"
+        ],
+        "Service": "servicecatalog-appregistry.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}

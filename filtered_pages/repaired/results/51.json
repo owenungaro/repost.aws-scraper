@@ -1,0 +1,9 @@
+{
+  "Sid": "AllowsAmazonQToIngestDocuments",
+  "Effect": "Allow",
+  "Action": [
+    "qbusiness:BatchPutDocument",
+    "qbusiness:BatchDeleteDocument"
+  ],
+  "Resource": "arn:aws:qbusiness:{{region}}:{{source_account}}:application/{{application_id}}/index/{{index_id}}"
+}
