@@ -82,14 +82,23 @@ def repair_policy(
     except Exception:
         return False
 
-    # ensure top-level Statement is a list
-    if "Statement" in policy and not isinstance(policy["Statement"], list):
-        policy["Statement"] = [policy["Statement"]]
+    # wrap missing Statement
+    if repair_stmt and "Statement" not in policy:
+        # if root JSON is already a list of statements
+        if isinstance(policy, list):
+            policy = {"Statement": policy}
+        else:
+            policy = {"Statement": [policy]}
         modified = True
+    else:
+        # ensure top-level Statement is a list
+        if "Statement" in policy and not isinstance(policy["Statement"], list):
+            policy["Statement"] = [policy["Statement"]]
+            modified = True
 
-    if "Statement" in policy:
-        stmts = policy["Statement"]
-        for stmt in stmts:
+    # process each statement in list
+    if isinstance(policy.get("Statement"), list):
+        for stmt in policy["Statement"]:
             if not isinstance(stmt, dict):
                 continue
             if repair_empty_cond and stmt.get("Condition") == {}:
